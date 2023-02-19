@@ -43,7 +43,7 @@ function App() {
 
   function handleNumberPress(value: string) {
     navigator.vibrate(50)
-    if (display.length > 7) { return }
+    if (display.length > 5) { return }
     if (display.includes('.') && value === '.') { return }
 
     if (display === '0' && value !== '.') {
@@ -214,10 +214,6 @@ function App() {
       <div className={styles.header}>
         <h1>Monobank</h1>
       </div>
-      {/* <Keypad /> */}
-
-      {/* <Players balance={playersBalance} names={playersNames} /> */}
-
 
       <div className={styles.selection} >
         {playersBalance.map((_, index) => (

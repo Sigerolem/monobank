@@ -1,8 +1,8 @@
 .container {
-  background-color: var(--tile-bg);
-  color: var(--tile-color);
-  height: 90%;
-  border: 0;
+  background-color: transparent;
+  color: var(--body);
+  height: 100%;
+  border: 1px solid white;
   border-radius: 1.5rem;
 
   display: flex;
@@ -10,8 +10,6 @@
   align-items: center;
 
   transition: all 150ms;
-
-  box-shadow: .2rem .2rem .2rem #333;
 
   &:active {
     scale: 0.95;

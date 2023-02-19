@@ -1,22 +1,21 @@
 .container {
-  background-color: var(--display-bg);
-  color: var(--display-color);
+  // background-color: var(--display-bg);
+  color: var(--body);
 
   width: 90%;
-  height: 10%;
+  height: 9%;
 
   display: flex;
   justify-content: end;
   align-items: center;
 
-  padding: 1rem;
-  margin: 1rem;
+  padding: .75rem;
+  margin: .5rem;
   border-radius: .25rem;
-  // border: solid .2rem #333;
-  box-shadow: .1rem .2rem .3rem #333 inset;
+  border: 1px solid white;
 
   h2 {
-    font-size: 2rem;
+    font-size: 1.75rem;
     font-family: 'Orbitron', sans-serif;
     letter-spacing: .25rem;
   }
