@@ -1,10 +1,10 @@
 import styles from './Tile.module.scss'
 
 interface TileProps {
-  value: string;
-  display?: string;
-  type: string;
-  onClicks: (value: string, type: string) => void;
+  value: string
+  display?: string
+  type: string
+  onClicks: (value: string, type: string) => void
 }
 
 export function Tile({ value, display, type, onClicks }: TileProps) {

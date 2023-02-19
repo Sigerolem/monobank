@@ -9,27 +9,31 @@ type PlayerState = 'unselected' | 'payer' | 'receiver'
 
 const INITIAL_PLAYERS_STATE = [{ state: 'unselected' }, { state: 'unselected' }, { state: 'unselected' }, { state: 'unselected' }, { state: 'unselected' }, { state: 'unselected' }]
 const INITIAL_PLAYERS_BALANCE = [15000, 15000, 15000, 15000, 15000, 15000]
+const INITIAL_PLAYERS_NAMES = ['Player 1', 'Player 2', 'Player 3', 'Player 4', 'Player 5', 'Player 6']
 
 function App() {
   const [display, setDisplay] = useState('0')
   const [playersBalance, setPlayersBalance] = useState(INITIAL_PLAYERS_BALANCE as number[])
+  const [playersNames, setplayersNames] = useState(INITIAL_PLAYERS_NAMES as string[])
   const [selected, setSelected] = useState(INITIAL_PLAYERS_STATE as { state: PlayerState }[])
   const firstRender = useRef(true)
 
   useEffect(() => {
-    console.log('entrou')
     if (firstRender.current) {
       let savedBalance = localStorage.getItem('monobank_balance')
-      if (savedBalance !== null) {
+      let savedNames = localStorage.getItem('monobank_names')
+      if (savedBalance !== null && savedNames !== null) {
         setPlayersBalance(JSON.parse(savedBalance))
+        setplayersNames(JSON.parse(savedNames))
       }
       firstRender.current = false
       return
     } else {
       localStorage.setItem('monobank_balance', JSON.stringify(playersBalance))
+      localStorage.setItem('monobank_names', JSON.stringify(playersNames))
     }
 
-  }, [playersBalance])
+  }, [playersBalance, playersNames])
 
   function handleKeyPress(value: string, type: string) {
     if (type === 'command') {
@@ -101,6 +105,7 @@ function App() {
       receivers.includes(index) ? player + 2000 : player
     )))
     setSelected(INITIAL_PLAYERS_STATE as { state: PlayerState }[])
+    setDisplay('0')
   }
 
   function handleTransaction(multiplier: string) {
@@ -163,6 +168,19 @@ function App() {
       return
     }
 
+    if (receivers.length > 1 && payers.length === 0) {
+      setPlayersBalance(prev => prev.map((value, index) => (
+        receivers.includes(index) ? value + transactionAmount : value
+      )))
+      return
+    }
+
+    if (payers.length > 1 && receivers.length === 0) {
+      setPlayersBalance(prev => prev.map((value, index) => (
+        payers.includes(index) ? value - transactionAmount : value
+      )))
+    }
+
   }
 
   function handleSelection(player: number) {
@@ -183,17 +201,28 @@ function App() {
 
   }
 
+  function formatBalance(balance: number) {
+    if (balance > 999) {
+      return (balance / 1000).toFixed(2) + 'M'
+    }
+    if (balance < 999) {
+      return (balance / 1000).toFixed(2) + 'M'
+    }
+    return balance + 'K'
+  }
+
   return (
     <div className={styles.container}>
-      <h1>Monobank</h1>
+      <div className={styles.header}>
+        <h1>Monobank</h1>
+      </div>
       {/* <Keypad /> */}
 
-      <Players players={playersBalance} />
+      {/* <Players balance={playersBalance} names={playersNames} /> */}
 
-      <Display value={display} />
 
       <div className={styles.selection} >
-        {playersBalance.map((player, index) => (
+        {playersBalance.map((_, index) => (
           <button key={index}
             onClick={() => { handleSelection(index) }}
             className={
@@ -202,11 +231,13 @@ function App() {
                   ? styles.receiver : ''
             }
           >
-            <h2>{index}</h2>
-            <h2>{player}</h2>
+            <h3>{playersNames[index]}</h3>
+            <h3>{formatBalance(playersBalance[index])}</h3>
           </button>
         ))}
       </div>
+
+      <Display value={display} />
 
       <div className={styles.keypad}>
         <Tile onClicks={handleKeyPress} value='K' type='command' />

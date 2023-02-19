@@ -1,13 +1,23 @@
 .container {
-  background-color: aqua;
-  width: 100%;
+  background-color: var(--display-bg);
+  color: var(--display-color);
+
+  width: 90%;
   height: 5rem;
+
   display: flex;
   justify-content: end;
   align-items: center;
+
   padding: 1rem;
+  margin: 1rem;
+  border-radius: .25rem;
+  // border: solid .2rem #333;
+  box-shadow: .1rem .2rem .3rem #333 inset;
 
   h2 {
     font-size: 2rem;
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: .25rem;
   }
 }
