@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import styles from './App.module.scss'
 import { Display } from './components/Display'
-import { Keypad } from './components/Keypad'
-import { Players } from './components/Players'
 import { Tile } from './components/Tile'
 
 type PlayerState = 'unselected' | 'payer' | 'receiver'
