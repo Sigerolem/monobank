@@ -7,14 +7,17 @@ type PlayerState = 'unselected' | 'payer' | 'receiver'
 
 const INITIAL_PLAYERS_STATE = [{ state: 'unselected' }, { state: 'unselected' }, { state: 'unselected' }, { state: 'unselected' }, { state: 'unselected' }, { state: 'unselected' }]
 const INITIAL_PLAYERS_BALANCE = [15000, 15000, 15000, 15000, 15000, 15000]
-const INITIAL_PLAYERS_NAMES = ['Player 1', 'Player 2', 'Player 3', 'Player 4', 'Player 5', 'Player 6']
+const INITIAL_PLAYERS_NAMES = ['Jogador 1', 'Jogador 2', 'Jogador 3', 'Jogador 4', 'Jogador 5', 'Jogador 6']
 
 function App() {
   const [display, setDisplay] = useState('0')
   const [playersBalance, setPlayersBalance] = useState(INITIAL_PLAYERS_BALANCE as number[])
-  const [playersNames, setplayersNames] = useState(INITIAL_PLAYERS_NAMES as string[])
+  const [playersNames, setPlayersNames] = useState(INITIAL_PLAYERS_NAMES as string[])
   const [selected, setSelected] = useState(INITIAL_PLAYERS_STATE as { state: PlayerState }[])
+  const [isEditingName, setIsEditingName] = useState(-1)
+  const [showResetMenu, setShowResetMenu] = useState(false)
   const firstRender = useRef(true)
+  const longPressTimer = useRef<number>()
 
   useEffect(() => {
     if (firstRender.current) {
@@ -22,7 +25,7 @@ function App() {
       let savedNames = localStorage.getItem('monobank_names')
       if (savedBalance !== null && savedNames !== null) {
         setPlayersBalance(JSON.parse(savedBalance))
-        setplayersNames(JSON.parse(savedNames))
+        setPlayersNames(JSON.parse(savedNames))
       }
       firstRender.current = false
       return
@@ -203,16 +206,20 @@ function App() {
     if (balance > 999) {
       return (balance / 1000).toFixed(2) + 'M'
     }
-    if (balance < 999) {
+    if (balance < -999) {
       return (balance / 1000).toFixed(2) + 'M'
     }
     return balance + 'K'
   }
 
+  function handleChangeName(playerIndex: number, newName: string) {
+    setPlayersNames(prev => prev.map((currentName, index) => (index === playerIndex ? newName : currentName)))
+  }
+
   return (
-    <div className={styles.container}>
+    <div onContextMenu={(e) => { e.preventDefault() }} className={styles.container}>
       <div className={styles.header}>
-        <h1>Monobank</h1>
+        <h1 draggable >Monobank</h1>
       </div>
 
       <div className={styles.selection} >
@@ -224,32 +231,80 @@ function App() {
                 ? styles.payer : selected[index].state === 'receiver'
                   ? styles.receiver : ''
             }
+            onAuxClick={() => {
+              setIsEditingName(index)
+            }}
+            onTouchStart={(e) => {
+              longPressTimer.current = setTimeout(() => {
+                navigator.vibrate(50)
+                setIsEditingName(index)
+                setTimeout(() => {
+                  let input = document.getElementById(`input${index}`)
+                  input?.focus()
+                }, 2);
+              }, 600)
+            }}
+            onTouchEnd={(e) => {
+              clearTimeout(longPressTimer.current)
+            }}
           >
-            <h3>{playersNames[index]}</h3>
-            <h3>{formatBalance(playersBalance[index])}</h3>
+            {isEditingName !== index ? (
+              <>
+                <h3>{playersNames[index]}</h3>
+                <h3>{formatBalance(playersBalance[index])}</h3>
+              </>
+            ) : (
+              <div onClick={(e) => { e.stopPropagation() }}>
+                <input
+                  id={`input${index}`}
+                  value={playersNames[index]}
+                  onChange={(e) => { handleChangeName(index, e.target.value) }}
+                  onBlur={() => { setIsEditingName(-1) }}
+                  onSubmit={() => { setIsEditingName(-1) }}
+                  onKeyDown={(e) => { if (e.key === 'Enter') { setIsEditingName(-1) } }}
+                  type="text"
+                />
+              </div>
+            )}
           </button>
         ))}
       </div>
 
       <Display value={display} />
 
-      <div className={styles.keypad}>
-        <Tile onClicks={handleKeyPress} value='K' type='command' />
-        <Tile onClicks={handleKeyPress} value='V' type='command' />
-        <Tile onClicks={handleKeyPress} value='M' type='command' />
-        <Tile onClicks={handleKeyPress} value='1' type='number' />
-        <Tile onClicks={handleKeyPress} value='2' type='number' />
-        <Tile onClicks={handleKeyPress} value='3' type='number' />
-        <Tile onClicks={handleKeyPress} value='4' type='number' />
-        <Tile onClicks={handleKeyPress} value='5' type='number' />
-        <Tile onClicks={handleKeyPress} value='6' type='number' />
-        <Tile onClicks={handleKeyPress} value='7' type='number' />
-        <Tile onClicks={handleKeyPress} value='8' type='number' />
-        <Tile onClicks={handleKeyPress} value='9' type='number' />
-        <Tile onClicks={handleKeyPress} value='C' type='command' />
-        <Tile onClicks={handleKeyPress} value='0' type='number' />
-        <Tile onClicks={handleKeyPress} value='.' type='number' />
-      </div>
+      {
+        showResetMenu ? (
+          <div className={styles.reset} >
+            <span>Tem certeza que quer resetar o jogo com os valores e nomes padrões?</span>
+            <button onClick={() => { setShowResetMenu(false) }} >Não</button>
+            <button onClick={() => {
+              setDisplay('')
+              setPlayersBalance(INITIAL_PLAYERS_BALANCE)
+              setPlayersNames(INITIAL_PLAYERS_NAMES)
+              setShowResetMenu(false)
+            }} >Sim</button>
+          </div>
+        ) : (
+          <div className={styles.keypad}>
+            <Tile onClicks={handleKeyPress} value='K' type='command' />
+            <Tile onClicks={handleKeyPress} value='V' display='←' type='command' />
+            <Tile onClicks={handleKeyPress} value='M' type='command' />
+            <Tile onClicks={handleKeyPress} value='1' type='number' />
+            <Tile onClicks={handleKeyPress} value='2' type='number' />
+            <Tile onClicks={handleKeyPress} value='3' type='number' />
+            <Tile onClicks={handleKeyPress} value='4' type='number' />
+            <Tile onClicks={handleKeyPress} value='5' type='number' />
+            <Tile onClicks={handleKeyPress} value='6' type='number' />
+            <Tile onClicks={handleKeyPress} value='7' type='number' />
+            <Tile onClicks={handleKeyPress} value='8' type='number' />
+            <Tile onClicks={handleKeyPress} value='9' type='number' />
+            <Tile onClicks={handleKeyPress} value='C' type='command' onLongPress={() => { setShowResetMenu(true) }} />
+            <Tile onClicks={handleKeyPress} value='0' type='number' />
+            <Tile onClicks={handleKeyPress} value='.' type='number' />
+          </div>
+        )
+      }
+
     </div>
   )
 }
