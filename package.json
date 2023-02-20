@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite --host",
     "build": "tsc && vite build",
+    "deploy": "git subtree push --prefix dist origin gh-pages",
     "preview": "vite preview"
   },
   "dependencies": {

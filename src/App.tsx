@@ -46,7 +46,7 @@ function App() {
 
   function handleNumberPress(value: string) {
     navigator.vibrate(50)
-    if (display.length > 5) { return }
+    if (display.length > 4) { return }
     if (display.includes('.') && value === '.') { return }
 
     if (display === '0' && value !== '.') {

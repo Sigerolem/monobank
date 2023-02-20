@@ -23,6 +23,7 @@ export function Tile({ value, display, type, onClicks, onLongPress }: TileProps)
           }, 600);
         }}
         onTouchEnd={() => { clearTimeout(longPressTimer.current) }}
+        onAuxClick={() => { onLongPress() }}
         onClick={() => { onClicks(value, type) }}
         className={styles.container} >
         <h2>{display}</h2>
