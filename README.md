@@ -1,5 +1,6 @@
 # monobank
 Projeto pessoal para substituir o banco eletronico do jogo Monopoly.
+- Acesse o projeto em execução <a href="https://sigerolem.github.io/monobank/" target="_blank" >neste link</a>
 
 ### Uso
 - Selecione o(s) jogador(res) que deve(m) receber ou pagar dinheiro.
